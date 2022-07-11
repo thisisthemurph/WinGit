@@ -5,22 +5,22 @@ function Get-Branch {
 
 function New-Branch {
   param (
-    [Parameter(Mandatory=$true)]
-    [string] $BranchName,
+    [Parameter(Position=0)]
+    [string] $Branch,
     [string] $Initials = "mu",
     [switch] $Bug = $false,
     [switch] $Devops = $false
   )
 
   if ($Bug) {
-    $BranchName = "bug/$Initials/$BranchName"
+    $Branch = "bug/$Initials/$Branch"
   } elseif ($Devops) {
-    $BranchName = "devops/$Initials/$BranchName"
+    $Branch = "devops/$Initials/$Branch"
   } else {
-    $BranchName = "feature/$Initials/$BranchName"
+    $Branch = "feature/$Initials/$Branch"
   }
 
-  $result = &git checkout -b $BranchName
+  $result = &git checkout -b $Branch
   Write-Host $result -ForegroundColor green
 }
 
@@ -55,6 +55,21 @@ function Remove-Branches {
   &git branch
 }
 
+function Git-Log {
+  param (
+    [switch] $Graph = $false
+  )
+
+  $params = @("--oneline")
+
+  if ($Graph) {
+    $params += "--graph"
+  }
+
+  &git log $params
+}
+
+Export-ModuleMember -Function "Git-Log"
 Export-ModuleMember -Function "Push-Fast"
 Export-ModuleMember -Function "Get-Branch"
 Export-ModuleMember -Function "New-Branch"
