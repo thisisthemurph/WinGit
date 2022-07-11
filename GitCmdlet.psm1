@@ -3,6 +3,32 @@ function Get-Branch {
   return &git branch | ForEach-Object -Process { if ($_.StartsWith("*")) { $_.Substring(2) } }
 }
 
+function Get-Branches {
+  param (
+    [switch] $Indexed
+  )
+
+  &git branch | ForEach-Object -Begin {$idx = 0} -Process {
+    $idx++
+
+    $headings = @()
+    [boolean] $isActive = $_.StartsWith("*")
+    [string] $name = "$_"
+    
+    if ($Indexed) {
+      $name = "$idx  $name"
+    }
+
+    if ($isActive) {
+      $name = -join("✅ ", $_.Substring(2))
+    }
+
+
+    Write-Host $name
+  }
+  
+}
+
 function New-Branch {
   param (
     [Parameter(Mandatory=$true)]
@@ -57,6 +83,7 @@ function Remove-Branches {
 
 Export-ModuleMember -Function "Push-Fast"
 Export-ModuleMember -Function "Get-Branch"
+Export-ModuleMember -Function "Get-Branches"
 Export-ModuleMember -Function "New-Branch"
 Export-ModuleMember -Function "Push-Branch"
 Export-ModuleMember -Function "Remove-Branches"
