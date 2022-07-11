@@ -27,6 +27,7 @@ function New-Branch {
 function Push-Branch {
   $branch = Get-Branch
 
+  # If there is an error in obtaining the branch
   if ($branch.StartsWith("fatal")) {
     Write-Host $branch -ForegroundColor -red
     return
@@ -36,6 +37,17 @@ function Push-Branch {
   return $result
 }
 
+function Push-Fast {
+  param (
+    [Parameter(Mandatory=$true)]
+    [string] $M
+  )
+
+  &git add .
+  &git commit -m $M
+  &git push
+}
+
 function Remove-Branches {
   # Delete all branches except main, master, or current
   &git branch | Select-String -Pattern '^(?!.*(\*|main|master)).*$' | ForEach-Object { git branch -D $_.ToString().Trim() }
@@ -43,6 +55,7 @@ function Remove-Branches {
   &git branch
 }
 
+Export-ModuleMember -Function "Push-Fast"
 Export-ModuleMember -Function "Get-Branch"
 Export-ModuleMember -Function "New-Branch"
 Export-ModuleMember -Function "Push-Branch"
