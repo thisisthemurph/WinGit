@@ -11,22 +11,42 @@ function Get-Branches {
   &git branch | ForEach-Object -Begin {$idx = 0} -Process {
     $idx++
 
-    $headings = @()
     [boolean] $isActive = $_.StartsWith("*")
     [string] $name = "$_"
-    
-    if ($Indexed) {
-      $name = "$idx  $name"
-    }
 
     if ($isActive) {
-      $name = -join("✅ ", $_.Substring(2))
+      $name = -join($name.Substring(2), " ⬅")
     }
 
+    $name = $name -replace "  ", ""
+    
+    if ($Indexed) {
+      $name = "$idx.  $name"
+    }
 
     Write-Host $name
-  }
+  } 
+}
+
+function Select-Branch {
+  Get-Branches -Indexed
+
+  $index = Read-Host "Select branch #:"
   
+  &git branch | ForEach-Object -Begin {$idx = 0} -Process { 
+    $idx++
+    
+    if ($idx -eq $index) {
+      $branch = $_ -replace "  ", ""
+      Write-Host "Changing to branch '$branch'" -ForegroundColor Yellow
+
+      if ($branch -match "\*") {
+        Write-Host "You are already on this branch 🤡" -ForegroundColor Red
+      } else {
+        &git checkout $branch
+      }
+    }
+  }
 }
 
 function New-Branch {
@@ -84,6 +104,7 @@ function Remove-Branches {
 Export-ModuleMember -Function "Push-Fast"
 Export-ModuleMember -Function "Get-Branch"
 Export-ModuleMember -Function "Get-Branches"
+Export-ModuleMember -Function "Select-Branch"
 Export-ModuleMember -Function "New-Branch"
 Export-ModuleMember -Function "Push-Branch"
 Export-ModuleMember -Function "Remove-Branches"
