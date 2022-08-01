@@ -15,7 +15,7 @@ function Get-Branches {
     [string] $name = "$_"
 
     if ($isActive) {
-      $name = -join($name.Substring(2), " ⬅")
+      $name = -join($name.Substring(2), " 🌳")
     }
 
     $name = $name -replace "  ", ""
@@ -31,7 +31,7 @@ function Get-Branches {
 function Select-Branch {
   Get-Branches -Indexed
 
-  $index = Read-Host "Select branch #:"
+  $index = Read-Host "Select branch #"
   
   &git branch | ForEach-Object -Begin {$idx = 0} -Process { 
     $idx++
